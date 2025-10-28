@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.galleryviewerapp.presemtation.ui.images.ImagesFragment
-import com.example.galleryviewerapp.presemtation.ui.videos.VideosFragment
+import com.example.galleryviewerapp.presemtation.ui.fragments.images.ImagesFragment
+import com.example.galleryviewerapp.presemtation.ui.fragments.videos.VideosFragment
 
 class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
     FragmentStateAdapter(fragmentManager, lifecycle) {

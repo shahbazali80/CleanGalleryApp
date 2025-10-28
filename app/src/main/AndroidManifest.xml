@@ -20,10 +20,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GalleryViewerApp">
         <activity
-            android:name=".presemtation.ui.media.MediaViewActivity"
+            android:name=".presemtation.ui.activities.media.MediaViewActivity"
             android:exported="false" />
         <activity
-            android:name=".presemtation.ui.MainActivity"
+            android:name=".presemtation.ui.activities.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

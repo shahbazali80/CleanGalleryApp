@@ -1,18 +1,16 @@
-package com.example.galleryviewerapp.presemtation.ui.media
+package com.example.galleryviewerapp.presemtation.ui.activities.media
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.galleryviewerapp.data.repository.SharedRepository
 import com.example.galleryviewerapp.databinding.ActivityMediaViewBinding
 import com.example.galleryviewerapp.domain.model.MediaType
-import com.example.galleryviewerapp.presemtation.utils.Constants.MEDIA_TYPE_INTENT
-import com.example.galleryviewerapp.presemtation.utils.Constants.MEDIA_URI_INTENT
 import com.example.galleryviewerapp.presemtation.utils.loadImages
 import com.example.galleryviewerapp.presemtation.utils.showToast
 import com.example.galleryviewerapp.presemtation.utils.visible
@@ -39,18 +37,17 @@ class MediaViewActivity : AppCompatActivity() {
     }
 
     private fun showMediaFileInfo() {
-        val uriString = intent.getStringExtra(MEDIA_URI_INTENT)
-        val type = intent.getStringExtra(MEDIA_TYPE_INTENT)
+        val mediaFile = SharedRepository.mMediaFile
 
-        if (uriString == null || type == null) {
+        if (mediaFile == null) {
             showToast("No media data")
             return
         }
 
-        val fileUri = uriString.toUri()
-        when (type) {
-            MediaType.VIDEO.name -> showVideo(fileUri)
-            MediaType.IMAGE.name -> showImage(fileUri)
+        val fileUri = mediaFile.uri.toString().toUri()
+        when (mediaFile.type) {
+            MediaType.VIDEO -> showVideo(fileUri)
+            MediaType.IMAGE -> showImage(fileUri)
         }
     }
 
@@ -88,5 +85,10 @@ class MediaViewActivity : AppCompatActivity() {
 
             videoView.requestFocus()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SharedRepository.clearMediaFile()
     }
 }

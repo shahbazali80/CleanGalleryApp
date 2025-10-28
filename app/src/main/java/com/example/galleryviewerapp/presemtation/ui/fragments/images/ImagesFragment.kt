@@ -1,54 +1,56 @@
-package com.example.galleryviewerapp.presemtation.ui.videos
+package com.example.galleryviewerapp.presemtation.ui.fragments.images
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.galleryviewerapp.databinding.FragmentVideosBinding
+import com.example.galleryviewerapp.data.repository.SharedRepository
+import com.example.galleryviewerapp.databinding.FragmentImagesBinding
 import com.example.galleryviewerapp.presemtation.adapters.MediaFileListAdapter
 import com.example.galleryviewerapp.presemtation.helper.PermissionManager
 import com.example.galleryviewerapp.presemtation.states.GalleryViewState
-import com.example.galleryviewerapp.presemtation.ui.media.MediaViewActivity
-import com.example.galleryviewerapp.presemtation.viewmodels.VideosViewModel
-import com.example.galleryviewerapp.presemtation.utils.Constants.MEDIA_TYPE_INTENT
-import com.example.galleryviewerapp.presemtation.utils.Constants.MEDIA_URI_INTENT
+import com.example.galleryviewerapp.presemtation.ui.activities.media.MediaViewActivity
+import com.example.galleryviewerapp.presemtation.utils.gone
 import com.example.galleryviewerapp.presemtation.utils.visible
+import com.example.galleryviewerapp.presemtation.viewmodels.ImagesViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class VideosFragment : Fragment() {
-    private var _binding: FragmentVideosBinding? = null
+class ImagesFragment : Fragment() {
+
+    private var _binding: FragmentImagesBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var mContext: Context
 
-    private val viewModel: VideosViewModel by viewModels()
+    private val viewModel: ImagesViewModel by activityViewModels()
 
     private lateinit var adapter: MediaFileListAdapter
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
             val allGranted = result.values.all { it }
-            if (allGranted) viewModel.loadVideos()
+            if (allGranted) viewModel.loadImages()
         }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentVideosBinding.inflate(inflater, container, false)
+        _binding = FragmentImagesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -62,17 +64,14 @@ class VideosFragment : Fragment() {
         mContext = requireContext()
 
         setRV()
-        fetchVideos()
+        fetchImages()
     }
 
     private fun setRV() {
         binding.apply {
             adapter = MediaFileListAdapter { selectedMediaFile ->
-                val intent = Intent(mContext, MediaViewActivity::class.java).apply {
-                    putExtra(MEDIA_URI_INTENT, selectedMediaFile.uri.toString())
-                    putExtra(MEDIA_TYPE_INTENT, selectedMediaFile.type.name)
-                }
-                mContext.startActivity(intent)
+                SharedRepository.mMediaFile = selectedMediaFile
+                mContext.startActivity(Intent(mContext, MediaViewActivity::class.java))
             }
             rvList.layoutManager = GridLayoutManager(mContext, 3)
             rvList.adapter = adapter
@@ -80,11 +79,13 @@ class VideosFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun fetchVideos() {
+    private fun fetchImages() {
+
+        //find the reason why u r using this ?
         binding.apply {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.Main) {
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.videos.collectLatest { state ->
+                    viewModel.images.collectLatest { state ->
                         when (state) {
                             is GalleryViewState.Loading -> {
                                 tvList.text = "Loading..."
@@ -93,7 +94,7 @@ class VideosFragment : Fragment() {
                                 val list = state.data
                                 adapter.setList(list)
                                 if (adapter.itemCount > 0) {
-                                    tvList.visible(false)
+                                    tvList.gone()
                                     rvList.visible()
                                 } else {
                                     rvList.visible(false)
@@ -111,7 +112,7 @@ class VideosFragment : Fragment() {
         }
 
         if (PermissionManager.hasAllPermissions(mContext)) {
-            viewModel.loadVideos()
+            viewModel.loadImages()
         } else {
             permissionLauncher.launch(PermissionManager.getRequiredPermissions())
         }
