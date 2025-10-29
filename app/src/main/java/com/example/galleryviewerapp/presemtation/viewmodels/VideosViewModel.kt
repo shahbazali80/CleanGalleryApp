@@ -2,6 +2,7 @@ package com.example.galleryviewerapp.presemtation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.galleryviewerapp.data.repository.SharedRepository
 import com.example.galleryviewerapp.domain.usecase.GetAllVideosUseCase
 import com.example.galleryviewerapp.presemtation.states.GalleryViewState
 import com.example.galleryviewerapp.presemtation.utils.DispatcherProvider
@@ -24,6 +25,7 @@ class VideosViewModel @Inject constructor(
             _videos.emit(GalleryViewState.Loading)
             try {
                 val list = getAllVideosUseCase()
+                SharedRepository.saveVideoFiles(list)
                 _videos.emit(GalleryViewState.Success(list))
             } catch (e: Exception) {
                 _videos.emit(GalleryViewState.Error(e.message ?: "Error fetching videos"))

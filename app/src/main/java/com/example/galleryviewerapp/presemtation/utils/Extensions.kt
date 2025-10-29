@@ -17,14 +17,10 @@ fun Context.loadImages(fileUri: Uri, imageView: ImageView) {
     Glide.with(this).load(fileUri).centerCrop().into(imageView)
 }
 
-fun View.visible(isVisible: Boolean = true) {
-    visibility = if (isVisible) View.VISIBLE else View.GONE
-}
-
 fun View.gone() {
     visibility =  View.GONE
 }
 
-fun View.invisible() {
-    visibility =  View.INVISIBLE
+fun View.visible() {
+    visibility =  View.VISIBLE
 }

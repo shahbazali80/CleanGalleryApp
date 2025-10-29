@@ -20,6 +20,7 @@ import com.example.galleryviewerapp.presemtation.adapters.MediaFileListAdapter
 import com.example.galleryviewerapp.presemtation.helper.PermissionManager
 import com.example.galleryviewerapp.presemtation.states.GalleryViewState
 import com.example.galleryviewerapp.presemtation.ui.activities.media.MediaViewActivity
+import com.example.galleryviewerapp.presemtation.utils.gone
 import com.example.galleryviewerapp.presemtation.viewmodels.VideosViewModel
 import com.example.galleryviewerapp.presemtation.utils.visible
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,8 +67,9 @@ class VideosFragment : Fragment() {
 
     private fun setRV() {
         binding.apply {
-            adapter = MediaFileListAdapter { selectedMediaFile ->
+            adapter = MediaFileListAdapter { selectedMediaFile, index ->
                 SharedRepository.mMediaFile = selectedMediaFile
+                SharedRepository.saveSelectedVideoIndex(index)
                 mContext.startActivity(Intent(mContext, MediaViewActivity::class.java))
             }
             rvList.layoutManager = GridLayoutManager(mContext, 3)
@@ -89,10 +91,10 @@ class VideosFragment : Fragment() {
                                 val list = state.data
                                 adapter.setList(list)
                                 if (adapter.itemCount > 0) {
-                                    tvList.visible(false)
+                                    tvList.gone()
                                     rvList.visible()
                                 } else {
-                                    rvList.visible(false)
+                                    rvList.gone()
                                     tvList.visible()
                                     tvList.text = "No file found"
                                 }

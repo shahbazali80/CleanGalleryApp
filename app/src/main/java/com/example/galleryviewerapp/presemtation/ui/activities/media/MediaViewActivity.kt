@@ -1,25 +1,24 @@
 package com.example.galleryviewerapp.presemtation.ui.activities.media
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.example.galleryviewerapp.data.repository.SharedRepository
 import com.example.galleryviewerapp.databinding.ActivityMediaViewBinding
+import com.example.galleryviewerapp.domain.model.MediaFile
 import com.example.galleryviewerapp.domain.model.MediaType
-import com.example.galleryviewerapp.presemtation.utils.loadImages
+import com.example.galleryviewerapp.presemtation.adapters.MediaPagerAdapter
 import com.example.galleryviewerapp.presemtation.utils.showToast
-import com.example.galleryviewerapp.presemtation.utils.visible
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MediaViewActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMediaViewBinding
+    private var isVideoFile: Boolean = false
+    private lateinit var mediaList: List<MediaFile>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,62 +32,50 @@ class MediaViewActivity : AppCompatActivity() {
             insets
         }
 
-        showMediaFileInfo()
+        initViewPager()
     }
 
-    private fun showMediaFileInfo() {
-        val mediaFile = SharedRepository.mMediaFile
+    private fun initViewPager() {
+        val imageList = SharedRepository.imageList
+        val videoList = SharedRepository.videoList
 
-        if (mediaFile == null) {
+        val current = SharedRepository.mMediaFile
+        isVideoFile = current?.type == MediaType.VIDEO
+
+        mediaList = if (isVideoFile) videoList ?: emptyList() else imageList ?: emptyList()
+        if (mediaList.isEmpty()) {
             showToast("No media data")
             return
         }
 
-        val fileUri = mediaFile.uri.toString().toUri()
-        when (mediaFile.type) {
-            MediaType.VIDEO -> showVideo(fileUri)
-            MediaType.IMAGE -> showImage(fileUri)
-        }
-    }
+        val adapter = MediaPagerAdapter(
+            mediaList = mediaList
+        )
 
-    private fun showImage(fileUri: Uri) {
-        binding.apply {
-            videoView.visible(false)
-            ivImg.visible()
+        binding.viewPager.adapter = adapter
 
-            loadImages(fileUri,ivImg)
-        }
-    }
+        val startIndex = if (isVideoFile) SharedRepository.selectedVideoIndex
+        else SharedRepository.selectedImageIndex
 
-    private fun showVideo(fileUri: Uri) {
-        binding.apply {
-            ivImg.visible(false)
-            videoView.visible()
+        binding.viewPager.setCurrentItem(startIndex, false)
 
-            videoView.setVideoURI(fileUri)
-
-            videoView.post {
-                videoView.setOnPreparedListener { mp ->
-                    mp.isLooping = false
-
-                    val videoWidth = mp.videoWidth
-                    val videoHeight = mp.videoHeight
-                    if (videoWidth > 0 && videoHeight > 0) {
-                        val lp = videoView.layoutParams as ConstraintLayout.LayoutParams
-                        lp.dimensionRatio = "$videoWidth:$videoHeight"
-                        videoView.layoutParams = lp
-                    }
-
-                    mp.start()
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val media = mediaList[position]
+                SharedRepository.mMediaFile = media
+                if (media.type == MediaType.VIDEO) {
+                    SharedRepository.saveSelectedVideoIndex(position)
+                    isVideoFile = true
+                } else {
+                    SharedRepository.saveSelectedImageIndex(position)
+                    isVideoFile = false
                 }
             }
-
-            videoView.requestFocus()
-        }
+        })
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        SharedRepository.clearMediaFile()
+        SharedRepository.clear()
     }
 }

@@ -24,7 +24,6 @@ import com.example.galleryviewerapp.presemtation.utils.gone
 import com.example.galleryviewerapp.presemtation.utils.visible
 import com.example.galleryviewerapp.presemtation.viewmodels.ImagesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -69,8 +68,9 @@ class ImagesFragment : Fragment() {
 
     private fun setRV() {
         binding.apply {
-            adapter = MediaFileListAdapter { selectedMediaFile ->
+            adapter = MediaFileListAdapter { selectedMediaFile, index ->
                 SharedRepository.mMediaFile = selectedMediaFile
+                SharedRepository.saveSelectedImageIndex(index)
                 mContext.startActivity(Intent(mContext, MediaViewActivity::class.java))
             }
             rvList.layoutManager = GridLayoutManager(mContext, 3)
@@ -83,7 +83,7 @@ class ImagesFragment : Fragment() {
 
         //find the reason why u r using this ?
         binding.apply {
-            lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch {
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.images.collectLatest { state ->
                         when (state) {
@@ -97,7 +97,7 @@ class ImagesFragment : Fragment() {
                                     tvList.gone()
                                     rvList.visible()
                                 } else {
-                                    rvList.visible(false)
+                                    rvList.gone()
                                     tvList.visible()
                                     tvList.text = "No file found"
                                 }
