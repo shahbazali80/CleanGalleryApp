@@ -21,6 +21,8 @@
         android:theme="@style/Theme.GalleryViewerApp">
         <activity
             android:name=".presemtation.ui.activities.media.MediaViewActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="fullSensor"
             android:exported="false" />
         <activity
             android:name=".presemtation.ui.activities.main.MainActivity"

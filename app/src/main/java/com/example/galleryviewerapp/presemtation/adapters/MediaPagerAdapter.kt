@@ -24,7 +24,8 @@ class MediaPagerAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         mContext = parent.context
-        val binding = MediaItemPreviewLayoutBinding.inflate(LayoutInflater.from(mContext), parent, false)
+        val binding =
+            MediaItemPreviewLayoutBinding.inflate(LayoutInflater.from(mContext), parent, false)
         return MediaViewHolder(binding)
     }
 
@@ -39,6 +40,7 @@ class MediaPagerAdapter(
                     videoView.gone()
                     mContext.loadImages(fileUri, ivImg)
                 }
+
                 MediaType.VIDEO -> {
                     ivImg.gone()
                     videoView.visible()
