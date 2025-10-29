@@ -25,7 +25,7 @@
             android:screenOrientation="fullSensor"
             android:exported="false" />
         <activity
-            android:name=".presemtation.ui.activities.main.MainActivity"
+            android:name=".presemtation.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

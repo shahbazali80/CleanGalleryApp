@@ -2,7 +2,6 @@ package com.example.galleryviewerapp.presemtation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.galleryviewerapp.data.repository.SharedRepository
 import com.example.galleryviewerapp.domain.usecase.GetAllImagesUseCase
 import com.example.galleryviewerapp.presemtation.states.GalleryViewState
 import com.example.galleryviewerapp.presemtation.utils.DispatcherProvider
@@ -20,17 +19,23 @@ class ImagesViewModel @Inject constructor(
     private val _images = MutableStateFlow<GalleryViewState>(GalleryViewState.Loading)
     val images: StateFlow<GalleryViewState> = _images
 
+    private val _selectedIndex = MutableStateFlow(0)
+    val selectedIndex: StateFlow<Int> = _selectedIndex
+
     fun loadImages() {
         viewModelScope.launch(dispatcherProvider.io) {
             _images.emit(GalleryViewState.Loading)
             try {
                 val list = getAllImagesUseCase()
-                SharedRepository.saveImageFiles(list)
                 _images.emit(GalleryViewState.Success(list))
             } catch (e: Exception) {
                 _images.emit(GalleryViewState.Error(e.message ?: "Error fetching images"))
             }
         }
+    }
+
+    fun saveSelectedImageIndex(index: Int) {
+        _selectedIndex.value = index
     }
 }
 

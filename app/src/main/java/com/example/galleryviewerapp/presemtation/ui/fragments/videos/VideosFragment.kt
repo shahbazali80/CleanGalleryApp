@@ -2,27 +2,25 @@ package com.example.galleryviewerapp.presemtation.ui.fragments.videos
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.galleryviewerapp.data.repository.SharedRepository
 import com.example.galleryviewerapp.databinding.FragmentVideosBinding
 import com.example.galleryviewerapp.presemtation.adapters.MediaFileListAdapter
 import com.example.galleryviewerapp.presemtation.helper.PermissionManager
 import com.example.galleryviewerapp.presemtation.states.GalleryViewState
-import com.example.galleryviewerapp.presemtation.ui.activities.media.MediaViewActivity
+import com.example.galleryviewerapp.presemtation.ui.MainActivity
 import com.example.galleryviewerapp.presemtation.utils.gone
-import com.example.galleryviewerapp.presemtation.viewmodels.VideosViewModel
 import com.example.galleryviewerapp.presemtation.utils.visible
+import com.example.galleryviewerapp.presemtation.viewmodels.VideosViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -34,7 +32,7 @@ class VideosFragment : Fragment() {
 
     private lateinit var mContext: Context
 
-    private val viewModel: VideosViewModel by viewModels()
+    private val viewModel: VideosViewModel by activityViewModels()
 
     private lateinit var adapter: MediaFileListAdapter
 
@@ -67,10 +65,9 @@ class VideosFragment : Fragment() {
 
     private fun setRV() {
         binding.apply {
-            adapter = MediaFileListAdapter { selectedMediaFile, index ->
-                SharedRepository.mMediaFile = selectedMediaFile
-                SharedRepository.saveSelectedVideoIndex(index)
-                mContext.startActivity(Intent(mContext, MediaViewActivity::class.java))
+            adapter = MediaFileListAdapter { index ->
+                viewModel.saveSelectedVideoIndex(index)
+                (requireActivity() as MainActivity).openMediaViewFragment(true)
             }
             rvList.layoutManager = GridLayoutManager(mContext, 3)
             rvList.adapter = adapter

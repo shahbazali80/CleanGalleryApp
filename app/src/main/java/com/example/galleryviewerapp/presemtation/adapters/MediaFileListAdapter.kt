@@ -11,7 +11,7 @@ import com.example.galleryviewerapp.domain.model.MediaFile
 import com.example.galleryviewerapp.presemtation.utils.loadImages
 
 class MediaFileListAdapter(
-    private val onFileItemClick: (MediaFile, index: Int) -> Unit
+    private val onFileItemClick: (index: Int) -> Unit
 ) : RecyclerView.Adapter<MediaFileListAdapter.ViewHolder>() {
 
     private val files = mutableListOf<MediaFile>()
@@ -35,7 +35,7 @@ class MediaFileListAdapter(
         val file = mediaFile.uri.toString().toUri()
         mContext.loadImages(file, holder.binding.ivThumbnail)
 
-        holder.itemView.setOnClickListener { onFileItemClick(mediaFile, position) }
+        holder.itemView.setOnClickListener { onFileItemClick(position) }
     }
 
     override fun getItemCount() = files.size

@@ -11,6 +11,7 @@ import com.example.galleryviewerapp.domain.model.MediaFile
 import com.example.galleryviewerapp.domain.model.MediaType
 import com.example.galleryviewerapp.presemtation.utils.gone
 import com.example.galleryviewerapp.presemtation.utils.loadImages
+import com.example.galleryviewerapp.presemtation.utils.showLog
 import com.example.galleryviewerapp.presemtation.utils.visible
 
 class MediaPagerAdapter(
@@ -32,6 +33,8 @@ class MediaPagerAdapter(
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
         val media = mediaList[position]
         val fileUri = media.uri.toString().toUri()
+
+        showLog("Shahbaz12345", "$media, $fileUri, ${mediaList.size}")
 
         holder.binding.apply {
             when (media.type) {

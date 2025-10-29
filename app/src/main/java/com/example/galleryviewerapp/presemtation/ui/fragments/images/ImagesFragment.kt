@@ -2,7 +2,6 @@ package com.example.galleryviewerapp.presemtation.ui.fragments.images
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,12 +13,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.galleryviewerapp.data.repository.SharedRepository
 import com.example.galleryviewerapp.databinding.FragmentImagesBinding
 import com.example.galleryviewerapp.presemtation.adapters.MediaFileListAdapter
 import com.example.galleryviewerapp.presemtation.helper.PermissionManager
 import com.example.galleryviewerapp.presemtation.states.GalleryViewState
-import com.example.galleryviewerapp.presemtation.ui.activities.media.MediaViewActivity
+import com.example.galleryviewerapp.presemtation.ui.MainActivity
 import com.example.galleryviewerapp.presemtation.utils.gone
 import com.example.galleryviewerapp.presemtation.utils.visible
 import com.example.galleryviewerapp.presemtation.viewmodels.ImagesViewModel
@@ -68,10 +66,9 @@ class ImagesFragment : Fragment() {
 
     private fun setRV() {
         binding.apply {
-            adapter = MediaFileListAdapter { selectedMediaFile, index ->
-                SharedRepository.mMediaFile = selectedMediaFile
-                SharedRepository.saveSelectedImageIndex(index)
-                mContext.startActivity(Intent(mContext, MediaViewActivity::class.java))
+            adapter = MediaFileListAdapter { index ->
+                viewModel.saveSelectedImageIndex(index)
+                (requireActivity() as MainActivity).openMediaViewFragment()
             }
             rvList.layoutManager = GridLayoutManager(mContext, 3)
             rvList.adapter = adapter
@@ -81,7 +78,6 @@ class ImagesFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun fetchImages() {
 
-        //find the reason why u r using this ?
         binding.apply {
             lifecycleScope.launch {
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
