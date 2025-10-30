@@ -113,4 +113,9 @@ class ImagesFragment : Fragment() {
             permissionLauncher.launch(PermissionManager.getRequiredPermissions())
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

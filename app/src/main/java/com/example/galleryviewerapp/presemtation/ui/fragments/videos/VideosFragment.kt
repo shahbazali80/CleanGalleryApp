@@ -111,4 +111,9 @@ class VideosFragment : Fragment() {
             permissionLauncher.launch(PermissionManager.getRequiredPermissions())
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

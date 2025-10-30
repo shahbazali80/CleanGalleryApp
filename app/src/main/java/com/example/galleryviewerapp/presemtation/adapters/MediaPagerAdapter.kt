@@ -34,8 +34,6 @@ class MediaPagerAdapter(
         val media = mediaList[position]
         val fileUri = media.uri.toString().toUri()
 
-        showLog("Shahbaz12345", "$media, $fileUri, ${mediaList.size}")
-
         holder.binding.apply {
             when (media.type) {
                 MediaType.IMAGE -> {
